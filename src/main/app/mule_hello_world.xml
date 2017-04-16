@@ -8,13 +8,17 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
     <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="8085" basePath="/test" doc:name="HTTP Listener Configuration"/>
-    <http:request-config name="HTTP_Request_Configuration"  host="jsonplaceholder.typicode.com" basePath="/" doc:name="HTTP Request Configuration" port="80"/>
+    <http:request-config name="HTTP_Request_Configuration"  host="jsonplaceholder.typicode.com" basePath="/posts" doc:name="HTTP Request Configuration" port="80"/>
     <flow name="mule_hello_worldFlow">
         <http:listener config-ref="HTTP_Listener_Configuration" path="/hello" doc:name="HTTP"/>
         <set-payload value="Hello World!" doc:name="Set Payload"/>
     </flow>
     <flow name="mule_consume_rest_ws">
         <http:listener config-ref="HTTP_Listener_Configuration" path="/testposts" allowedMethods="GET" doc:name="HTTP"/>
-        <http:request config-ref="HTTP_Request_Configuration" path="posts" method="GET" doc:name="HTTP"/>
+        <http:request config-ref="HTTP_Request_Configuration" path="/{postnumber}" method="GET" doc:name="HTTP">
+            <http:request-builder>
+                <http:uri-param paramName="postnumber" value="#[message.inboundProperties.'http.query.params'.postnumber]"/>
+            </http:request-builder>
+        </http:request>
     </flow>
 </mule>
